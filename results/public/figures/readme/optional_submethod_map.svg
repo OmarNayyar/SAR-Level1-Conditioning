@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="540" viewBox="0 0 1200 540" role="img" aria-labelledby="title desc">
+  <title id="title">Stage-1 conditioning submethod map</title>
+  <desc id="desc">Additive methods target thermal noise floors and artifacts. Multiplicative methods target speckle and coherent texture.</desc>
+  <rect width="1200" height="540" rx="28" fill="#0f172a"/>
+  <text x="60" y="72" fill="#f8fafc" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="800">Method families used inside the bundles</text>
+  <text x="60" y="108" fill="#cbd5e1" font-family="Segoe UI, Arial, sans-serif" font-size="18">The repo keeps additive cleanup and speckle handling explicit.</text>
+  <g font-family="Segoe UI, Arial, sans-serif">
+    <rect x="80" y="160" width="470" height="290" rx="26" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+    <text x="315" y="210" text-anchor="middle" fill="#e0f2fe" font-size="28" font-weight="800">Additive / artifact side</text>
+    <text x="130" y="265" fill="#bae6fd" font-size="19">- metadata and noise-vector subtraction</text>
+    <text x="130" y="310" fill="#bae6fd" font-size="19">- destriping / low-rank sparse correction</text>
+    <text x="130" y="355" fill="#bae6fd" font-size="19">- starlet multiscale sparse cleanup</text>
+    <text x="130" y="400" fill="#bae6fd" font-size="19">- PnP / ADMM inverse-problem cleanup</text>
+    <rect x="650" y="160" width="470" height="290" rx="26" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+    <text x="885" y="210" text-anchor="middle" fill="#fef3c7" font-size="28" font-weight="800">Multiplicative / speckle side</text>
+    <text x="700" y="265" fill="#fde68a" font-size="19">- Lee and refined Lee local-stat filters</text>
+    <text x="700" y="310" fill="#fde68a" font-size="19">- MuLoG / BM3D-style log-domain filtering</text>
+    <text x="700" y="355" fill="#fde68a" font-size="19">- MERLIN-style complex SLC self-supervision</text>
+    <text x="700" y="400" fill="#fde68a" font-size="19">- Speckle2Void-style blind-spot learning</text>
+  </g>
+  <text x="600" y="500" text-anchor="middle" fill="#e2e8f0" font-family="Segoe UI, Arial, sans-serif" font-size="17">A bundle is a practical combination of one or both sides, selected by domain and evidence.</text>
+</svg>

@@ -1,600 +1,275 @@
-# SAR Stage-1 Conditioning: Denoising and Validation for Maritime SAR Imagery
+# SAR Stage-1 Conditioning
 
-`sar-stage1-conditioning` is a practical SAR Stage-1 conditioning repo for downstream segmentation and maritime object-analysis screening.
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![License: MIT](https://img.shields.io/badge/license-MIT-green)
+![Tests](https://img.shields.io/badge/tests-40%20passing-brightgreen)
+![Domain](https://img.shields.io/badge/domain-SAR%20%2F%20remote%20sensing-slateblue)
 
-The repo is not trying to build one universal denoiser. It compares practical conditioning routes that keep three pieces explicit:
-- additive-noise handling
-- multiplicative-speckle handling
-- downstream sanity checks
+**Stage-1 SAR conditioning, denoising, and validation for maritime SAR imagery.**
 
-Domain distinctions stay explicit throughout the code and outputs:
-- `complex_slc`
-- `amplitude`
-- `intensity / power`
-- `log domain`
+This repo screens practical SAR conditioning routes between standard SAR product formation and downstream AI. It does **not** claim that denoising always helps. It asks which conditioning route helps which task, under which data domain, and with what evidence.
 
-## What This Repo Does
+![Stage-1 pipeline overview](results/public/figures/readme/stage1_pipeline_overview.svg)
 
-This repo is designed to answer a practical screening question:
+## What Problem Does This Solve?
 
-Which Stage-1 conditioning route gives the cleanest, most defensible improvement for downstream SAR analysis under realistic metadata and storage constraints?
+SAR imagery is noisy in ways that are easy to misunderstand. A ship detector, segmentation model, or object-analysis pipeline may see granular speckle, thermal noise floors, banding, seams, or metadata-dependent calibration artifacts. Removing those effects can improve visual or denoising metrics, but it can also shift the image distribution that a detector learned.
 
-The original project brief positions Stage-1 conditioning after focusing/basic calibration and before downstream AI. This repo keeps that scope: it uses realistically available product metadata where possible, falls back to image-fitted estimates where metadata is missing, and keeps additive noise, multiplicative speckle, and combined SAR noise separate.
+This project turns that ambiguity into a repeatable screening workflow:
 
-It supports:
-- multiple bundles
-- multiple additive submethods inside Bundle A
-- metadata-rich and metadata-poor inputs
-- public benchmarks plus external/local datasets
-- honest proxy evaluation plus a separate real detector-baseline path
+- compare raw imagery against four Stage-1 conditioning bundles;
+- separate paired denoising metrics from detector compatibility metrics;
+- preserve domain labels such as SLC, amplitude, intensity/power, and log-domain;
+- avoid operational claims unless a conditioned variant beats raw on the target downstream task.
 
-## Bootstrap
+## Technical Version
 
-Windows-friendly local setup:
+The original project brief is a **SAR Stage-1 Conditioning Screening Report for Downstream Semantic Segmentation and Maritime Object Analysis**. Stage-1 sits after focusing/basic calibration and before downstream AI. It uses realistically available product metadata where possible, including calibration/noise vectors, NESZ/noise-floor information, mode/polarization metadata, and image-fitted estimates when metadata is missing.
+
+The implementation covers additive correction, multiplicative speckle handling, complex/SLC future work, paired denoising evaluation, downstream detector compatibility, artifact manifests, and reuse-first execution guards.
+
+## SAR Noise Model
+
+SAR observations are usually better treated as a combined noise problem, not a single generic "bad image" problem.
+
+![SAR noise model split](results/public/figures/readme/noise_model_split.svg)
+
+| Noise component | Practical meaning | Typical symptom | Stage-1 response |
+| --- | --- | --- | --- |
+| Additive thermal/noise floor | Extra energy added to the scene measurement | raised dark ocean floor, seams, banding, product-level bias | metadata/noise-vector subtraction, floor estimation, destriping, PnP/ADMM cleanup |
+| Multiplicative speckle | Signal-dependent granular variation from coherent imaging | salt-and-pepper texture, low-look variability | Lee/refined Lee, MuLoG/BM3D-style log-domain despeckling, blind-spot methods |
+| Combined noise | Real products can contain both | structured artifacts plus granular speckle | bundle routing by product domain, metadata availability, and downstream task |
+
+Domain labels matter:
+
+- **Complex SLC:** phase-aware complex data; required for serious Bundle C/MERLIN validation.
+- **Amplitude:** magnitude-like representation before intensity/power conversion.
+- **Intensity/power:** detected imagery common in public chips and GRD-like workflows.
+- **Log-domain:** useful for turning multiplicative speckle into a form that Gaussian denoisers can handle more naturally.
+
+## Bundle Overview
+
+![Bundle matrix visual](results/public/figures/readme/bundle_matrix_visual.svg)
+
+| Bundle | Additive/artifact step | Speckle/self-supervised step | Input domain | Best use case | Current evidence |
+| --- | --- | --- | --- | --- | --- |
+| Raw | none | none | benchmark/product native | detector baseline and control | best current YOLO mAP on SSDD/HRSID |
+| Bundle A | metadata/noise-vector correction, image floor estimate, or structured additive fallback | Lee/refined Lee | intensity / GRD-like | interpretable screening and metadata-aware baseline | improves Mendeley denoising metrics vs raw, but trails raw detector mAP |
+| Bundle A conservative | milder A-family correction | milder Lee-style filtering | intensity / GRD-like | lower-risk A-family ablation | improves paired metrics vs raw, still not detector winner |
+| Bundle B | destriping / low-rank / artifact-aware correction | MuLoG/BM3D-style log-domain despeckling | intensity / log-intensity | paired denoising quality | strongest current PSNR/SSIM/MSE on Mendeley validation |
+| Bundle C | starlet complex denoising | MERLIN-style SLC self-supervision | complex SLC preferred | future SLC-first route | implemented as feasibility path; not fully proven without SLC data |
+| Bundle D | PnP/ADMM additive cleanup | Speckle2Void-style blind-spot despeckling | intensity / log-intensity | metadata-poor, mixed, or structure-preserving route | strong SSIM and edge-preservation behavior |
+
+## Submethod Explainer
+
+![Submethod map](results/public/figures/readme/optional_submethod_map.svg)
+
+**Metadata/noise-vector subtraction:** subtracts an estimated thermal/noise floor from detected intensity, using product metadata when available. Invalid or negative corrected values are clipped safely rather than treated as real signal.
+
+**Destriping / low-rank / sparse correction:** separates structured row/column artifacts, periodic banding, or seam-like effects from scene content. It is useful when the noise is not random-looking speckle but a visible product artifact.
+
+**Starlet denoising:** uses multiscale sparse shrinkage inspired by astronomy and faint-structure recovery. In this repo it belongs to the complex/SLC-facing path, especially when real and imaginary channels are available.
+
+**PnP/ADMM:** frames denoising as an inverse problem that alternates data consistency with a denoiser prior. It is useful when metadata are weak but the conditioning should stay conservative and structured.
+
+**Lee/refined Lee:** uses local statistics to smooth homogeneous regions while trying to preserve edges. This is the interpretable classical speckle-filtering family used in Bundle A.
+
+**MuLoG/BM3D-style despeckling:** handles multiplicative speckle in a log-domain representation where Gaussian denoisers are more natural. Bundle B uses this family as the main paired denoising route.
+
+**MERLIN:** a complex SLC self-supervised strategy that uses real/imaginary structure rather than clean reference targets. This is a planned Bundle C validation path once genuine SLC data are available.
+
+**Speckle2Void:** a blind-spot self-supervised intensity despeckling idea that predicts pixels from neighboring context. Bundle D uses this family as an intensity-only, metadata-poor candidate.
+
+## Routing Guide
+
+![Bundle routing decision tree](results/public/figures/readme/bundle_routing_decision_tree.svg)
+
+Start with raw as the control. Then choose the first conditioning route by product domain and noise regime:
+
+- use **Bundle C** if genuine complex SLC data are available;
+- use **Bundle A** first for intensity/GRD data with credible metadata or noise vectors;
+- use **Bundle B** for structured artifacts, striping, banding, and paired denoising quality;
+- use **Bundle D** for intensity-only, mixed, unknown, or metadata-poor cases where structure preservation matters.
+
+## Results
+
+![Evidence summary visual](results/public/figures/readme/evidence_summary_visual.svg)
+
+### A. Paired Denoising Quality: Mendeley SAR Despeckling Validation
+
+The Mendeley validation split has 100 matched noisy/reference SAR image pairs. Here, **raw** means the noisy input compared directly against the reference target.
+
+| Variant | Mean PSNR (higher better) | Mean SSIM (higher better) | Mean MSE (lower better) | Mean NRMSE (lower better) | Edge preservation (higher better) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Raw | 18.0782 | 0.5261 | 0.016500 | 0.3256 | 0.5583 |
+| Bundle A | 19.4577 | 0.5651 | 0.012262 | 0.2751 | 0.5390 |
+| Bundle A conservative | 18.8610 | 0.5544 | 0.013822 | 0.2971 | 0.5647 |
+| Bundle B | **20.3082** | **0.5974** | **0.009829** | **0.2513** | **0.5880** |
+| Bundle D | 19.4313 | 0.5825 | 0.012149 | 0.2794 | 0.5871 |
+
+<p align="center">
+  <img src="results/public/figures/denoising_psnr.png" alt="PSNR comparison" width="48%">
+  <img src="results/public/figures/denoising_ssim.png" alt="SSIM comparison" width="48%">
+</p>
+
+<p align="center">
+  <img src="results/public/figures/denoising_mse.png" alt="MSE comparison" width="48%">
+  <img src="results/public/figures/denoising_edge_preservation.png" alt="Edge preservation comparison" width="48%">
+</p>
+
+Takeaway: **Bundle B gives the strongest paired denoising metrics in the current public validation.** Bundle D is also useful as a structure-preserving candidate.
+
+### B. Detector Compatibility: SSDD/HRSID Lightweight YOLO Sweep
+
+Detector compatibility answers a different question: does this detector perform better after conditioning? In this setup, raw imagery remains strongest for the current lightweight YOLO detector baseline.
+
+| Dataset | Current detector winner | Best mAP | Interpretation |
+| --- | --- | ---: | --- |
+| SSDD | Raw | 0.4894 | raw best matches this YOLO setup |
+| HRSID | Raw | 0.6486 | raw best matches this YOLO setup |
+
+<p align="center">
+  <img src="results/public/figures/detector_map_comparison.png" alt="Detector mAP comparison" width="70%">
+</p>
+
+This does **not** mean denoising is useless. It means detector tuning and image-distribution shift matter. A detector trained or tuned on conditioned imagery could behave differently.
+
+## How To Run
+
+### Windows PowerShell
 
 ```powershell
+git clone https://github.com/OmarNayyar/SAR-Level1-Conditioning.git
+cd SAR-Level1-Conditioning
+
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 .\.venv\Scripts\python.exe -m pip install -e ".[app,dev]"
-```
 
-Optional extras:
-
-```powershell
-.\.venv\Scripts\python.exe -m pip install -e ".[detection]"
-.\.venv\Scripts\python.exe -m pip install -e ".[notebooks]"
-```
-
-If you prefer a single requirements file for local work:
-
-```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-```
-
-Fast validation after install:
-
-```powershell
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-Editable install also exposes console commands for the main repo flows:
-- `sar-stage1-bundle-a`
-- `sar-stage1-bundle-b`
-- `sar-stage1-bundle-c`
-- `sar-stage1-bundle-d`
-- `sar-stage1-detection`
-- `sar-stage1-final-sweep`
-- `sar-stage1-denoise-eval`
-- `sar-stage1-denoise-panels`
-- `sar-stage1-final-figures`
-- `sar-stage1-sentinel-samples`
-- `sar-stage1-audit`
-- `sar-stage1-demo-index`
-- `sar-stage1-surface-check`
-
-## Current Readiness
-
-### Dataset snapshot
-
-| Dataset | Status | Current local snapshot | Practical role now |
-| --- | --- | --- | --- |
-| `ssdd` | `partial` | `1160` chips (`train: 928`, `test: 232`) | main ship-detection sanity-check dataset |
-| `hrsid` | `partial` | `5604` chips (`train: 3642`, `test: 1962`) | second ship-detection sanity-check dataset |
-| `sentinel1` | `partial` | `6` locally prepared/evaluated GRD products in the current evidence cache | metadata-driven and proxy-style SAR scene path |
-| `sen1floods11` | `partial` | `6` smoke samples (`2/2/2`) | segmentation smoke path only |
-| `ai4arctic` | `metadata-only` | `0` local samples | not ready for serious local experiments |
-| `ls_ssdd` | `metadata-only` | `0` local samples | blocked by source portal, ignored for now |
-
-Audit outputs:
-- `results/data_audit/audit_summary.json`
-- `results/data_audit/audit_summary.md`
-- local-only audit notes are excluded from the public export
-
-### Bundle maturity
-
-| Bundle | Additive method | Multiplicative method | Domain | Current maturity | Best use case |
-| --- | --- | --- | --- | --- | --- |
-| `A` | `A0/A1/A2/A3` family | Refined Lee | intensity | interpretable screening family | interpretable baseline and supervisor-facing comparison path |
-| `B` | structured cleanup / destriping | MuLoG-style denoising | log-intensity | usable secondary | harder additive artifacts and alternative noise-aware route |
-| `C` | starlet shrinkage | MERLIN wrapper / fallback | complex SLC preferred | feasibility only | demo path when genuine complex SLC is available |
-| `D` | PnP-ADMM additive cleanup | Speckle2Void wrapper / fallback | intensity / log-intensity | usable secondary | alternative inverse-problem route |
-
-Practical interpretation:
-- `Bundle A` is the main interpretable screening family right now, not the operational detector baseline.
-- `Bundle B` is currently the strongest paired denoising candidate on the local Mendeley validation split.
-- `Bundle D` is a useful structure-preserving candidate.
-- `Bundle C` should be treated as feasibility-grade unless real complex SLC support is present.
-- Current Sentinel-1 scene rankings are still proxy-only and overview-scale; they are useful for routing decisions, not final detector claims.
-- A lightweight YOLO downstream detector path is wired on SSDD/HRSID. The completed final sweep shows raw imagery remains strongest for the current detector setup, while conditioned bundles remain candidates for separate denoising-quality and task-specific validation.
-
-### Current result summary
-
-The repo now has two separate evidence tracks:
-
-| Track | Current result | Interpretation |
-| --- | --- | --- |
-| Paired denoising, Mendeley validation split | Bundle B has the best PSNR/SSIM/MSE among the tested variants. | This is denoising-quality evidence. |
-| Detector compatibility, SSDD/HRSID YOLO sweep | Raw imagery has the best detector mAP in the current setup. | This is detector/data-distribution compatibility evidence. |
-
-Do not collapse these into one claim. A detector preferring raw imagery does not make denoising invalid; it means the current detector setup is still best matched to raw texture/edge statistics.
-
-## Bundle A Additive Submethods
-
-Bundle A is now a family of additive submethods with a fixed multiplicative step:
-- additive: `A0 / A1 / A2 / A3`
-- multiplicative: `refined_lee`
-
-### Submethod table
-
-| Code | Name | What it does | Requires | Trust level |
-| --- | --- | --- | --- | --- |
-| `A0` | No additive correction | pass-through baseline | intensity image only | `baseline-only` |
-| `A1` | Metadata thermal / noise-vector subtraction | subtract additive noise using `noise_vector`, `noise_power`, or `nesz_db` style metadata | product metadata | `metadata-driven` |
-| `A2` | Image-derived additive floor estimate | estimate a constant additive floor from the lower-tail intensity distribution | intensity image only | `image-derived` |
-| `A3` | Structured additive artifact correction | apply artifact-aware destriping / structured cleanup in intensity space | intensity image with detectable structured artifact pattern | `artifact-based` |
-
-Bundle A can run in:
-- `auto` mode: choose the most practical additive submethod for the current sample
-- forced mode: explicitly run `A0`, `A1`, `A2`, or `A3`
-
-Every Bundle A run records:
-- additive submethod code and human-readable name
-- description
-- required inputs
-- whether useful additive metadata was actually available
-- what fallback was used if metadata was absent
-- confidence / trust level
-
-### Current Bundle A routing rules
-
-- `A0` is the control. It is preferred when the scene looks clean enough that additive correction is not justified.
-- `A1` is the metadata-driven route. It should be trusted when noise vectors or equivalent metadata exist, but overview-scale proxy metrics may under-credit its benefit.
-- `A2` is the practical metadata-poor fallback. It estimates an additive floor from the image itself.
-- `A3` is a specialist for visible stripe-like or structured additive artifacts.
-
-## Evidence Grades and Proxy Scoring
-
-The repo now separates three ideas:
-
-- `proxy metrics`: ENL, edge sharpness, target/background separability, and threshold F1.
-- `decision heuristics`: a balanced score used to rank methods for screening.
-- `evidence grade`: how much confidence the current data supports.
-
-The balanced decision score intentionally caps ENL reward and penalizes edge loss so over-smoothed outputs do not win just because they look homogeneous. It also records caveats such as `A1 may be under-credited by overview-scale proxy metrics`.
-
-Common grades:
-
-| Grade | Meaning |
-| --- | --- |
-| `claim-grade` | A real downstream detector/segmenter evaluation is wired and reported. |
-| `screening-grade / proxy-only` | Useful for choosing what to test next, but not final mAP/IoU evidence. |
-| `proxy-only / overview-scale` | Sentinel-1 scene evidence from memory-safe overviews or decimated products. |
-| `feasibility-grade` | Runnable path, but the right data regime is still too weak for claims. |
-| `thin`, `thin-but-improving`, `developing` | Evidence breadth labels based mostly on scene/sample count and caveats. |
-
-## Commands
-
-## Repo Map
-
-| Path | Purpose |
-| --- | --- |
-| `configs/` | Bundle, dataset, and downstream baseline configs. |
-| `src/stage1/` | Additive, multiplicative, metric, statistics, Sentinel-1 batch, and visualization code. |
-| `src/bundles/` | Bundle A/B/C/D orchestration. |
-| `src/datasets/` | Dataset manifests, loaders, registry, Sentinel-1 fetch/prepare/evidence helpers. |
-| `src/downstream/detection/` | YOLO-format dataset preparation and optional Ultralytics detector runner. |
-| `src/reporting/` | Decision scoring, result indexes, demo curation, and app-facing summaries. |
-| `scripts/` | Main command-line entry points for bundles, datasets, detector baseline, audit, and reporting. |
-| `scripts/sentinel1/` | Sentinel-1 inspection, planning, expansion, and batch comparison commands. |
-| `scripts/downstream/` | Namespaced downstream-evaluation wrappers; root commands remain for compatibility. |
-| `apps/` | Streamlit decision/demo app. |
-| `results/` | Lightweight commit-safe summaries plus ignored visual artifacts. |
-| `outputs/` | Local generated caches, detector-prepared datasets, Sentinel-1 batch outputs; ignored by git. |
-
-Documentation:
-- `docs/PDF_ALIGNMENT_AUDIT.md`
-- `docs/BUNDLE_METHOD_GUIDE.md`
-- `docs/RESULTS_SUMMARY.md`
-- `docs/FINAL_RESULTS_INTERPRETATION.md`
-- `docs/GIT_RELEASE_CHECKLIST.md`
-- `docs/DATA_DOWNLOAD_GUIDE_DENOISING.md`
-- `docs/PUBLIC_MEETING_BRIEF.md`
-
-### Bundle runs
-
-Reuse-first note:
-- Bundle, detector, and Sentinel-1 batch commands now default to cache reuse.
-- If matching artifacts already exist, the command will load them.
-- If artifacts are missing, the command will stop with a clear message instead of silently recomputing.
-- Use `--allow-conditioning`, `--allow-prepare`, `--allow-train`, and `--allow-eval` only when you intentionally want heavy work.
-
-Run Bundle A in auto mode:
+Launch the Streamlit app:
 
 ```powershell
-python scripts/run_bundle_a.py --config configs/bundle_a.yaml
+.\.venv\Scripts\python.exe -m streamlit run apps\streamlit_app.py
 ```
 
-Force a specific Bundle A additive submethod:
+Run a paired denoising evaluation if the Mendeley dataset is available locally:
 
 ```powershell
-python scripts/run_bundle_a.py --config configs/bundle_a.yaml --additive-submethod A0
-python scripts/run_bundle_a.py --config configs/bundle_a.yaml --additive-submethod A1
-python scripts/run_bundle_a.py --config configs/bundle_a.yaml --additive-submethod A2
-python scripts/run_bundle_a.py --config configs/bundle_a.yaml --additive-submethod A3
+.\.venv\Scripts\python.exe scripts\evaluate_denoising_quality.py `
+  --dataset mendeley `
+  --input-root "data/raw/Mendeley SAR dataset" `
+  --split val `
+  --variants raw,bundle_a,bundle_a_conservative,bundle_b,bundle_d `
+  --max-samples 20 `
+  --output-root outputs/denoising_quality
 ```
 
-Note:
-- default auto runs write to `results/bundle_a`
-- forced or dataset-overridden Bundle A runs now default to separate `outputs/bundle_a_...` folders unless you provide `--output-root`
-- add `--allow-conditioning` only when you intentionally want to regenerate a bundle run
-
-Run Bundle B:
+Generate denoising panels:
 
 ```powershell
-python scripts/run_bundle_b.py --config configs/bundle_b.yaml
+.\.venv\Scripts\python.exe scripts\make_denoising_panels.py `
+  --output-root outputs\denoising_quality `
+  --max-panels 12
 ```
 
-Run Bundle C:
+Dry-run the final detector sweep before any heavy run:
 
 ```powershell
-python scripts/run_bundle_c.py --config configs/bundle_c.yaml
+.\.venv\Scripts\python.exe scripts\run_final_sweep.py --dry-run
 ```
 
-Run Bundle D:
+Only run the heavy detector sweep intentionally:
 
 ```powershell
-python scripts/run_bundle_d.py --config configs/bundle_d.yaml
+.\.venv\Scripts\python.exe scripts\run_final_sweep.py
 ```
 
-Run tuning profiles without editing code:
+### Linux / macOS
 
-```powershell
-.\.venv\Scripts\python.exe scripts/run_bundle_a.py --config configs/bundles/profiles/bundle_a_conservative.yaml
-.\.venv\Scripts\python.exe scripts/run_bundle_b.py --config configs/bundles/profiles/bundle_b_balanced.yaml
-.\.venv\Scripts\python.exe scripts/run_bundle_d.py --config configs/bundles/profiles/bundle_d_conservative.yaml
+```bash
+git clone https://github.com/OmarNayyar/SAR-Level1-Conditioning.git
+cd SAR-Level1-Conditioning
+
+python3 -m venv .venv
+./.venv/bin/python -m pip install --upgrade pip
+./.venv/bin/python -m pip install -e ".[app,dev]"
+./.venv/bin/python -m pytest -q
+./.venv/bin/python -m streamlit run apps/streamlit_app.py
 ```
 
-### Downstream detector baseline
+## Streamlit App
 
-Prepare full raw SSDD/HRSID splits for YOLO without training. This verifies that the local data and annotations are usable before spending time on detector training:
+The app is a public-safe result browser and decision cockpit. It shows:
 
-```powershell
-.\.venv\Scripts\python.exe scripts/run_detection_baseline.py --dataset ssdd --variants raw --limit-per-split none --mode prepare --output-root outputs\downstream_detection_fullprep --allow-prepare
-.\.venv\Scripts\python.exe scripts/run_detection_baseline.py --dataset hrsid --variants raw --limit-per-split none --mode prepare --output-root outputs\downstream_detection_fullprep --allow-prepare
+- project purpose and current conclusions;
+- additive vs multiplicative SAR noise explanations;
+- bundle routing and method tables;
+- Mendeley denoising metrics and figures;
+- SSDD/HRSID detector compatibility evidence;
+- visual panel/gallery sections when local artifacts are present;
+- graceful missing-artifact messages rather than accidental recomputation.
+
+By default the app uses the public surface. A separate private/internal mode exists in code for controlled local handoff workflows, but the public GitHub repo is framed for public-data validation.
+
+## Data
+
+Raw datasets are **not committed**. This repo includes code, configs, tests, docs, lightweight public figures, and summary CSV/JSON files.
+
+Expected Mendeley paired denoising structure:
+
+```text
+data/raw/Mendeley SAR dataset/
+  GTruth/
+  GTruth_val/
+  Noisy/
+  Noisy_val/
 ```
 
-Run the current validation-scale detector comparison. This compares raw imagery against default Bundle A, Bundle D, and a conservative Bundle A variant:
+Sentinel-1 GRD/SLC utilities are included for optional sample search and future product-level validation. Credentials must be supplied through environment variables only; do not write credentials into configs.
 
-```powershell
-pip install ultralytics
-.\.venv\Scripts\python.exe scripts/run_detection_baseline.py --dataset ssdd --variants raw bundle_a bundle_d bundle_a_conservative --limit-per-split 64 --mode all --epochs 2 --imgsz 416 --batch 4 --workers 0 --output-root outputs\downstream_detection_validation_trained --allow-prepare --allow-train --allow-eval
-.\.venv\Scripts\python.exe scripts/run_detection_baseline.py --dataset hrsid --variants raw bundle_a bundle_d bundle_a_conservative --limit-per-split 64 --mode all --epochs 2 --imgsz 416 --batch 4 --workers 0 --output-root outputs\downstream_detection_validation_trained --allow-prepare --allow-train --allow-eval
+## Repo Structure
+
+```text
+apps/                         Streamlit public result browser
+configs/                      bundle, dataset, detector, and final-sweep configs
+docs/                         public explanation, results, and release notes
+results/public/               lightweight public summary tables and figures
+scripts/                      CLI entrypoints for evaluation, bundles, figures, and checks
+src/                          reusable Stage-1 conditioning and dataset code
+tests/                        lightweight test suite
 ```
 
-For a stronger full experiment, start from `configs/downstream/yolo_baseline.yaml` and deliberately increase the split size and epochs:
+## What This Project Proves
 
-```powershell
-.\.venv\Scripts\python.exe scripts/run_detection_baseline.py --config configs/downstream/yolo_medium.yaml --dataset ssdd --mode all --allow-prepare --allow-train --allow-eval
-.\.venv\Scripts\python.exe scripts/run_detection_baseline.py --config configs/downstream/yolo_medium.yaml --dataset hrsid --mode all --allow-prepare --allow-train --allow-eval
-```
+- A practical Stage-1 SAR conditioning screening framework can be run reproducibly.
+- Bundle B improves paired denoising metrics on Mendeley validation versus raw noisy input.
+- Bundle D is a useful structure-preserving candidate.
+- Detector compatibility can be evaluated separately from denoising quality.
+- Raw remains the detector baseline for the current lightweight YOLO setup.
 
-Bundle profiles can also be injected into detector preparation/training:
+## What This Project Does Not Prove
 
-```powershell
-.\.venv\Scripts\python.exe scripts/run_detection_baseline.py `
-  --config configs/downstream/yolo_medium.yaml `
-  --dataset ssdd `
-  --variants raw bundle_b bundle_d `
-  --bundle-b-config configs/bundles/profiles/bundle_b_conservative.yaml `
-  --bundle-d-config configs/bundles/profiles/bundle_d_conservative.yaml `
-  --mode all `
-  --allow-prepare --allow-train --allow-eval
-```
+- It does not prove that one universal SAR denoiser exists.
+- It does not prove that denoising always improves detection or segmentation.
+- It does not prove Bundle C/MERLIN performance without genuine complex SLC validation.
+- It does not make claims for non-public operational data before representative products are tested.
 
-What this means:
-- `mode prepare` is a real dataset-conversion check but does not report mAP.
-- `mode all` trains/evaluates a compact YOLO baseline and writes mAP / precision / recall / F1 when Ultralytics completes.
-- `--limit-per-split none` uses all available records for the selected dataset/variant. Use it deliberately; it is meant for preparation checks or longer training sessions.
-- `--workers 0` is the safest Windows default and avoids local multiprocessing/cache permission failures.
-- SSDD and HRSID are the supported public ship-detection datasets for this first downstream path.
-- This detector path is separate from proxy-only bundle screening.
-- Current detector findings should be read as validation evidence, not a tuned SOTA claim. The key finding so far is not "Bundle A is bad forever"; it is that this detector setup appears to depend on raw edge/texture cues that default conditioning suppresses.
+## Next Steps
 
-Detector outputs:
-- `outputs/downstream_detection_validation_trained/metrics/downstream_comparison.csv`
-- `outputs/downstream_detection_validation_trained/metrics/variant_deltas.csv`
-- `outputs/downstream_detection_validation_trained/metrics/diagnostic_summary.csv`
-- `outputs/downstream_detection_validation_trained/tables/diagnostic_summary.md`
+- Validate on representative real-world SAR products with known product level, mode, polarization, metadata, and downstream task.
+- Add genuine SLC validation for Bundle C and MERLIN-style self-supervision.
+- Tune or retrain detectors on conditioned imagery to test whether the detector/raw gap is distribution-driven.
+- Add semantic segmentation benchmarks in addition to ship detection.
 
-Generate the comparison pack:
+## References And Method Notes
 
-```powershell
-python scripts/export_figures.py --bundles bundle_a bundle_b bundle_c bundle_d
-```
+The README intentionally keeps citations compact. See [docs/BUNDLE_METHOD_GUIDE.md](docs/BUNDLE_METHOD_GUIDE.md) and [docs/PDF_ALIGNMENT_AUDIT.md](docs/PDF_ALIGNMENT_AUDIT.md) for method-family mapping and original-brief alignment.
 
-Build the Streamlit demo index from existing visual outputs:
+Relevant method families include Sentinel-1 thermal/noise-vector correction, Lee/refined Lee speckle filtering, MuLoG/BM3D-style log-domain despeckling, starlet sparse denoising, plug-and-play ADMM, MERLIN, and Speckle2Void.
 
-```powershell
-python scripts/build_demo_index.py --max-examples 8
-```
+## License
 
-### Paired denoising evidence
-
-Run the paired Mendeley validation track:
-
-```powershell
-.\.venv\Scripts\python.exe scripts/evaluate_denoising_quality.py --dataset mendeley --input-root "data/raw/Mendeley SAR dataset" --split val --variants raw,bundle_a,bundle_a_conservative,bundle_b,bundle_d --max-samples 100 --output-root outputs/denoising_quality
-```
-
-Generate presentation panels:
-
-```powershell
-.\.venv\Scripts\python.exe scripts/make_denoising_panels.py --output-root outputs\denoising_quality --max-panels 12
-```
-
-Build final report figures and public/private result summaries from cached artifacts:
-
-```powershell
-.\.venv\Scripts\python.exe scripts/make_final_figures.py
-```
-
-Generate the public-safe summary pack:
-
-```powershell
-python scripts/generate_handoff_pack.py --surface public
-```
-
-Check the intended public export surface:
-
-```powershell
-python scripts/check_repo_surface.py --surface public
-```
-
-### Final intentional sweep
-
-Dry-run the frozen final sweep before any expensive rerun:
-
-```powershell
-.\.venv\Scripts\python.exe scripts/run_final_sweep.py --dry-run
-```
-
-Dry-run metadata is written to `outputs/final_sweep/final_sweep_summary_dry_run.json` so it does not overwrite the completed sweep summary.
-
-The completed final sweep artifacts live under `outputs/final_sweep/`. Only rerun the heavy sweep intentionally if you are replacing those artifacts:
-
-```powershell
-.\.venv\Scripts\python.exe scripts/run_final_sweep.py
-```
-
-Final-sweep references:
-- `configs/final_sweep.yaml`
-- `docs/RESULTS_SUMMARY.md`
-- `docs/FINAL_RESULTS_INTERPRETATION.md`
-
-### Streamlit app
-
-Launch the public-safe local result browser:
-
-```powershell
-$env:SAR_APP_SURFACE="public"
-.\.venv\Scripts\streamlit.exe run apps/streamlit_app.py
-```
-
-Local launch note:
-- the app still bootstraps the repo root itself for direct script execution
-- editable install via `pip install -e ".[app,dev]"` is the cleanest way to use the repo
-- if `SAR_APP_SURFACE` is unset, the app defaults to `public`
-
-### Dataset audit
-
-Regenerate the dataset audit:
-
-```powershell
-python scripts/audit_datasets.py --preview-count 3
-```
-
-## Sentinel-1 Workflow
-
-GRD dry-run:
-
-```powershell
-python scripts/fetch_sentinel1_subset.py --config configs/datasets/sentinel1_grd_small.yaml --dry-run --force
-```
-
-Selective fetch:
-
-```powershell
-$env:CDSE_USERNAME="your_username"
-$env:CDSE_PASSWORD="your_password"
-python scripts/fetch_sentinel1_subset.py `
-  --config configs/datasets/sentinel1_grd_small.yaml `
-  --download-count 1 `
-  --force
-```
-
-Prepare local SAFE content:
-
-```powershell
-python scripts/prepare_sentinel1_local.py --product-family GRD
-```
-
-Run Bundle A on Sentinel-1:
-
-```powershell
-python scripts/run_bundle_a.py `
-  --config configs/bundle_a.yaml `
-  --dataset sentinel1 `
-  --split all `
-  --sample-limit 1
-```
-
-Run the Sentinel-1 multi-scene Bundle A batch comparison:
-
-```powershell
-python scripts/sentinel1/run_bundle_a_sentinel1_batch.py --compare-submethods
-```
-
-Expand Sentinel-1 GRD evidence, prepare new scenes locally, and rerun the batch comparison:
-
-```powershell
-python scripts/sentinel1/expand_sentinel1_evidence.py --target-ready-scenes 12 --max-new-downloads 8 --force
-```
-
-If a session cannot write to `data/`, use the lightweight override cache before running Sentinel-1 inspection, expansion, or the app:
-
-```powershell
-$env:SAR_DATA_LAYOUT_ROOT=(Resolve-Path "outputs\dataset_state")
-```
-
-Force one additive submethod across the currently local Sentinel-1 GRD scenes:
-
-```powershell
-python scripts/sentinel1/run_bundle_a_sentinel1_batch.py --additive-submethod A0
-python scripts/sentinel1/run_bundle_a_sentinel1_batch.py --additive-submethod A1
-python scripts/sentinel1/run_bundle_a_sentinel1_batch.py --additive-submethod A2
-python scripts/sentinel1/run_bundle_a_sentinel1_batch.py --additive-submethod A3
-```
-
-Inspect local Sentinel-1 readiness and missing rows:
-
-```powershell
-python scripts/sentinel1/inspect_sentinel1_local.py
-```
-
-Plan the next Sentinel-1 evidence round without downloading anything:
-
-```powershell
-python scripts/sentinel1/plan_sentinel1_evidence.py --target-scene-count 10
-```
-
-Notes:
-- AUX / OPOD / PREORB / EOF products are excluded unless explicitly requested.
-- Zipped SAFE products are prepared into `data/interim/sentinel1/prepared/`.
-- Bundle A uses a memory-safe COG overview for very large local GRD products.
-- Some Copernicus COG TIFFs need `imagecodecs` for local decode support.
-- Sentinel-1 batch outputs are written under `outputs/bundle_a_sentinel1_batch/` with compact scene summaries, submethod comparisons, and per-scene recommendations.
-
-## Output Layout
-
-New runs use a standardized structure:
-
-- `config/`
-- `metrics/`
-- `plots/`
-- `galleries/`
-- `statistics/`
-- `tables/`
-- `logs/`
-
-Bundle A writes the main human-readable tables under:
-- `results/bundle_a/tables/sample_summary.csv`
-- `results/bundle_a/tables/run_overview.csv`
-- `results/bundle_a/tables/run_summary.md`
-- `results/bundle_a/tables/submethod_summary.csv`
-- `results/bundle_a/tables/submethod_aggregate.csv`
-
-Bundle A metrics and machine-readable summaries live under:
-- `results/bundle_a/metrics/run_summary.json`
-- `results/bundle_a/metrics/topline_metrics.json`
-- `results/bundle_a/metrics/per_sample_metrics.csv`
-- `results/bundle_a/metrics/aggregate_metrics.csv`
-
-Bundle A statistical baseline outputs live under:
-- `results/bundle_a/statistics/`
-
-Important honesty rule:
-- these are Stage-1 screening and proxy-evaluation outputs
-- they are not real detector mAP claims unless a real downstream detector path is actually wired
-
-Downstream detector artifacts live under:
-- `outputs/downstream_detection/<dataset>/prepared/`
-- `outputs/downstream_detection/<dataset>/metrics/downstream_comparison.csv`
-- `outputs/downstream_detection/<dataset>/metrics/variant_deltas.csv`
-- `outputs/downstream_detection/metrics/downstream_comparison.csv`
-- `outputs/downstream_detection/metrics/variant_deltas.csv`
-- `outputs/downstream_detection/metrics/run_summary.json`
-
-## Streamlit App Pages
-
-The local Streamlit app supports:
-- Start Here page
-- public-safe mode by default
-- about / glossary page
-- overview page
-- bundle results page
-- visual comparison page
-- demo / try-a-scene page
-- downstream detection page
-- Bundle A submethod page
-- statistics page
-- Sentinel-1 readiness page
-- dataset audit page
-
-The app is designed as a decision cockpit rather than a raw data browser:
-- conclusions first
-- key metrics second
-- visuals third
-- raw JSON behind expanders
-
-The Sentinel-1 page also includes a Bundle A scene-comparison section that shows:
-- all currently usable GRD scenes
-- which A0 / A1 / A2 / A3 runs were completed
-- per-scene recommendations
-- metadata availability and overview-only warnings
-- confidence/evidence labels and decision-basis notes
-
-The demo page uses existing local output images. It does not upload data, train a model, or create new claims; it simply curates representative before/after/difference panels for quick explanation.
-
-The app handles missing data gracefully and reads both the newer standardized layout and older legacy result folders.
-
-## External Or Local Data
-
-The registry-based dataset workflow remains intact for future external or local datasets.
-
-External/local data may lack noise XML, have partial metadata, live outside the repo, or arrive with COCO/YOLO/bounding-box CSV annotations. That is expected. The repo supports registry-based dataset handling, custom local registration, external path registration, and later data additions without large bundle refactors.
-
-Register a future local dataset:
-
-```powershell
-python scripts/register_local_dataset.py `
-  --dataset-name local_ship_detection_v1 `
-  --path "C:\path\to\dataset_root" `
-  --owner "local team" `
-  --remote-source "external/local source" `
-  --source-access local `
-  --pixel-domain intensity `
-  --annotation-match stem
-```
-
-Validate a future external detection dataset before trying to run bundles or detectors:
-
-```powershell
-python scripts/validate_external_detection_dataset.py --config configs/datasets/external_detection_template.yaml
-```
-
-The external detection adapter currently supports `COCO`, `YOLO`, and simple bounding-box CSV-style manifests. It validates paths, image counts, annotation presence, and box counts so future dataset handoffs can fail loudly instead of quietly producing empty detector runs.
-
-## Optional External Methods
-
-These remain optional integrations, not hard repo requirements:
-
-| Method | Bundle | Status in this repo |
-| --- | --- | --- |
-| `BM3D` | `bundle_b` | optional |
-| `MERLIN` | `bundle_c` | optional |
-| `Speckle2Void` | `bundle_d` | optional |
-
-Example optional install:
-
-```powershell
-pip install bm3d
-```
-
-## GitHub Readiness
-
-The repo is structured to stay GitHub-ready:
-- raw data is ignored
-- prepared SAFE caches and large outputs are ignored
-- configs, manifests, docs, code, tables, and lightweight JSON/CSV summaries stay commit-safe
-
-This repo should contain reproducible code, configs, manifests, audit outputs, result tables, and small summary artifacts, not benchmark archives or heavyweight local caches.
+MIT License. See [LICENSE](LICENSE).

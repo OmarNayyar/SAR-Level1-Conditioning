@@ -73,6 +73,9 @@ results/**/*.onnx
 !results/**/*.csv
 !results/public/figures/
 !results/public/figures/*.png
+!results/public/figures/readme/
+!results/public/figures/readme/*.png
+!results/public/figures/readme/*.svg
 !results/public/tables/
 !results/public/tables/*.md
 !results/public/tables/*.json
