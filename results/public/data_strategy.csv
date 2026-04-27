@@ -1,0 +1,4 @@
+dataset,role,current_use,next_action
+SSDD,public ship detector validation,ready for raw-vs-conditioned YOLO comparisons,run medium/serious detector configs before claiming detector impact
+HRSID,public ship detector validation,ready for raw-vs-conditioned YOLO comparisons,repeat with larger split and longer training; inspect small-target failure cases
+Sentinel-1 GRD,real-product routing and metadata availability evidence,"proxy-only, overview-scale Bundle A submethod routing",add targeted maritime GRD scenes and validate full-resolution subsets where feasible

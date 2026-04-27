@@ -1,0 +1,28 @@
+bundle:
+  name: bundle_b
+  title: "Bundle B Conservative - Light Artifact Cleanup"
+  readiness: detector_tuning_candidate
+profile:
+  name: conservative
+  purpose: "Milder B path for detector preservation when structured artifacts are suspected."
+dataset:
+  name: hrsid
+  split: train
+  sample_limit: 16
+processing:
+  additive:
+    method: destripe_lowrank_sparse
+    domain: log_intensity
+    orientation: columns
+    background_sigma: 11.0
+    profile_sigma: 4.0
+    correction_strength: 0.35
+  multiplicative:
+    method: mulog_bm3d
+    domain: log_intensity
+    backend_preference: wavelet
+    strength: 0.35
+outputs:
+  root: outputs/profiles/bundle_b_conservative
+  max_visual_samples: 6
+  save_intermediate_arrays: false

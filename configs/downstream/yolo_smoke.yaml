@@ -1,0 +1,21 @@
+dataset:
+  name: ssdd
+  # Keep the first detector pass small and reproducible. Increase this once the
+  # pipeline is verified locally.
+  limit_per_split: 64
+  val_fraction: 0.2
+variants:
+  - raw
+  - bundle_a
+detector:
+  backend: ultralytics
+  model: yolov8n.pt
+  epochs: 3
+  imgsz: 640
+  batch: 8
+  # Windows-safe default; raise only if local multiprocessing is known to work.
+  workers: 0
+  eval_split: test
+  device: ""
+outputs:
+  root: outputs/downstream_detection

@@ -1,0 +1,27 @@
+dataset:
+name: external_or_private_detection
+  # Supported values: coco, yolo, bbox_csv, image_annotation_map
+  format: coco
+  # Keep real data outside the repo when possible; register the path here.
+  path: C:/path/to/external/dataset
+
+  # COCO:
+  image_dir: images
+  annotation_path: annotations/instances.json
+
+  # YOLO:
+  # dataset_yaml: dataset.yaml
+
+  # bbox_csv:
+  # image_dir: images
+  # annotation_path: boxes.csv
+  # required columns: image_path or file_name, xmin, ymin, xmax, ymax
+
+  # image_annotation_map / custom_map:
+  # manifest_path: manifest.csv
+  # required columns: image_path, annotation_path
+
+metadata:
+  domain: intensity
+  source: external
+notes: "Template only. Copy this file and point it at a real external or private/internal dataset."

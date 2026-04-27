@@ -1,0 +1,5 @@
+bundle,role,domain,current_reading
+A,interpretable conditioning/screening family,intensity / power,useful for transparent ablations; not the best detector baseline
+B,primary paired denoising candidate,log-intensity / structured cleanup,strongest paired Mendeley PSNR/SSIM/MSE result
+C,future complex-domain candidate,complex SLC preferred,defer until genuine SLC data are available
+D,structure-preserving candidate,intensity / log-intensity,improves SSIM and edge preservation versus raw on paired validation

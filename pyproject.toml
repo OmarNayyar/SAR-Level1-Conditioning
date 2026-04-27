@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sar-stage1-conditioning"
+version = "0.1.0"
+description = "Stage-1 SAR conditioning experiments for additive noise, speckle, and downstream analysis"
+authors = [{name = "Omar"}]
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Image Processing",
+]
+keywords = ["sar", "remote-sensing", "speckle", "denoising", "ultralytics", "streamlit"]
+dependencies = [
+    "numpy>=1.26,<3",
+    "scipy>=1.11,<2",
+    "matplotlib>=3.8,<4",
+    "scikit-image>=0.22,<0.26",
+    "imagecodecs>=2024.1.1,<2027",
+    "pandas>=2.2,<3",
+    "PyYAML>=6.0,<7",
+    "requests>=2.31,<3",
+    "Pillow>=10,<12",
+]
+
+[project.optional-dependencies]
+app = [
+    "streamlit>=1.40,<2",
+]
+detection = [
+    "ultralytics>=8.3,<9",
+]
+notebooks = [
+    "jupyter>=1.1,<2",
+]
+dev = [
+    "pytest>=8.2,<9",
+]
+
+[project.scripts]
+sar-stage1-audit = "scripts.audit_datasets:main"
+sar-stage1-bundle-a = "scripts.run_bundle_a:main"
+sar-stage1-bundle-b = "scripts.run_bundle_b:main"
+sar-stage1-bundle-c = "scripts.run_bundle_c:main"
+sar-stage1-bundle-d = "scripts.run_bundle_d:main"
+sar-stage1-demo-index = "scripts.build_demo_index:main"
+sar-stage1-detection = "scripts.run_detection_baseline:main"
+sar-stage1-final-sweep = "scripts.run_final_sweep:main"
+sar-stage1-handoff = "scripts.generate_handoff_pack:main"
+sar-stage1-surface-check = "scripts.check_repo_surface:main"
+sar-stage1-denoise-eval = "scripts.evaluate_denoising_quality:main"
+sar-stage1-denoise-panels = "scripts.make_denoising_panels:main"
+sar-stage1-sentinel-samples = "scripts.download_sentinel1_samples:main"
+sar-stage1-final-figures = "scripts.make_final_figures:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*", "scripts*"]
+exclude = ["tests", "tests.*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = ["pytest-cache-files-*", ".pytest_cache", "outputs", "data"]
+addopts = "-p no:cacheprovider"

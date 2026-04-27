@@ -1,0 +1,85 @@
+surface: public
+description: Public open-source portfolio/research surface.
+
+required_paths:
+  - README.md
+  - LICENSE
+  - pyproject.toml
+  - requirements.txt
+  - .gitignore
+  - apps/streamlit_app.py
+  - configs/
+  - scripts/
+  - src/
+  - tests/
+  - manifests/public_release_manifest.yaml
+  - docs/PUBLIC_RELEASE_CHECKLIST.md
+  - docs/GIT_RELEASE_CHECKLIST.md
+  - docs/PDF_ALIGNMENT_AUDIT.md
+  - docs/RESULTS_SUMMARY.md
+  - docs/DATA_DOWNLOAD_GUIDE_DENOISING.md
+  - docs/BUNDLE_METHOD_GUIDE.md
+  - docs/FINAL_RESULTS_INTERPRETATION.md
+  - docs/PUBLIC_MEETING_BRIEF.md
+
+optional_paths:
+  - notebooks/
+  - results/public/
+  - docs/figures/
+  - docs/math_notes/
+  - docs/reading_notes/
+
+exclude_paths:
+  - .git/
+  - .venv/
+  - .codex_tmp/
+  - .idea/
+  - .pytest_cache/
+  - "**/__pycache__/*"
+  - "*.pyc"
+  - data/raw/
+  - data/interim/
+  - data/processed/
+  - outputs/
+  - runs/
+  - results/public/artifact_manifest.json
+  - results/handoff/
+  - docs/HANDOFF_GUIDE.md
+  - docs/DATA_STRATEGY.md
+  - docs/PRIVATE_HANDOFF_CHECKLIST.md
+  - docs/PRIVATE_HANDOFF_README.md
+  - docs/OMAR_DECISIONS_REQUIRED.md
+  - docs/PUBLIC_PRIVATE_SURFACES.md
+  - docs/REPO_SPLIT_STRATEGY.md
+  - docs/data_audit_summary.md
+  - docs/supervisor_slides/
+  - docs/archive/
+  - docs/FINAL_PROJECT_STATUS.md
+  - docs/CLEANUP_REVIEW_NEEDED.md
+  - docs/ARTIFACT_LAYOUT.md
+  - docs/FINAL_SWEEP_CHECKLIST.md
+  - docs/HEAVY_ENTRYPOINT_AUDIT.md
+  - docs/DENOISING_EVIDENCE_PLAN.md
+  - docs/TENSORBOARD_GUIDE.md
+  - docs/MEETING_*.md
+  - papers/
+  - pytest-cache-files-*/
+  - yolov8n.pt
+
+forbidden_keywords:
+  - keyword: current_recommendation_to_private_org
+    reason: Old private recommendation key should not appear in public files.
+  - keyword: private-surface-marker
+    reason: Public release should not expose private-surface page language.
+  - keyword: closed-data operational claim
+    reason: Public release should avoid non-public-data adoption claims.
+
+required_checks:
+  - .\.venv\Scripts\python.exe -m pytest -q
+  - .\.venv\Scripts\python.exe scripts/check_repo_surface.py --surface public
+  - .\.venv\Scripts\python.exe scripts/run_final_sweep.py --dry-run
+
+notes:
+  - Root README is the public README.
+  - Final public tables are generated under results/public; report figures are generated under ignored outputs/final_figures.
+  - Third-party papers should not be exported unless redistribution is explicitly allowed.

@@ -1,0 +1,31 @@
+bundle:
+  name: bundle_d
+  title: "Bundle D Conservative - Texture-Preserving Inverse Route"
+  readiness: detector_tuning_candidate
+profile:
+  name: conservative
+  purpose: "Milder D route to test whether inverse cleanup can preserve detector cues."
+dataset:
+  name: hrsid
+  split: train
+  sample_limit: 16
+processing:
+  additive:
+    method: pnp_admm_additive
+    domain: log_intensity
+    iterations: 3
+    rho: 0.7
+    denoiser_backend: wavelet
+    strength: 0.35
+  multiplicative:
+    method: speckle2void_wrapper
+    domain: intensity
+    fallback_sigma: 0.55
+    strength: 0.35
+    external:
+      command: []
+      cwd: ""
+outputs:
+  root: outputs/profiles/bundle_d_conservative
+  max_visual_samples: 6
+  save_intermediate_arrays: false

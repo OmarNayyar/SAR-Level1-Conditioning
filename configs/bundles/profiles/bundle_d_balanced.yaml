@@ -1,0 +1,31 @@
+bundle:
+  name: bundle_d
+  title: "Bundle D Balanced - PnP-ADMM + Speckle2Void"
+  readiness: secondary_candidate
+profile:
+  name: balanced
+  purpose: "Metadata-poor inverse/self-supervised candidate."
+dataset:
+  name: hrsid
+  split: train
+  sample_limit: 16
+processing:
+  additive:
+    method: pnp_admm_additive
+    domain: log_intensity
+    iterations: 6
+    rho: 1.0
+    denoiser_backend: wavelet
+    strength: 0.8
+  multiplicative:
+    method: speckle2void_wrapper
+    domain: intensity
+    fallback_sigma: 1.0
+    strength: 0.8
+    external:
+      command: []
+      cwd: ""
+outputs:
+  root: outputs/profiles/bundle_d_balanced
+  max_visual_samples: 6
+  save_intermediate_arrays: false

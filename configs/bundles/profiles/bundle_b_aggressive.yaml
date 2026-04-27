@@ -1,0 +1,28 @@
+bundle:
+  name: bundle_b
+  title: "Bundle B Aggressive - Structured Artifact Stress Test"
+  readiness: stress_test_only
+profile:
+  name: aggressive
+  purpose: "Aggressive destriping/log-domain denoising for obvious structured contamination."
+dataset:
+  name: hrsid
+  split: train
+  sample_limit: 16
+processing:
+  additive:
+    method: destripe_lowrank_sparse
+    domain: log_intensity
+    orientation: columns
+    background_sigma: 7.0
+    profile_sigma: 2.0
+    correction_strength: 1.25
+  multiplicative:
+    method: mulog_bm3d
+    domain: log_intensity
+    backend_preference: bm3d
+    strength: 1.0
+outputs:
+  root: outputs/profiles/bundle_b_aggressive
+  max_visual_samples: 6
+  save_intermediate_arrays: false

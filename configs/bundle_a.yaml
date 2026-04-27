@@ -1,0 +1,54 @@
+bundle:
+  name: bundle_a
+  title: "Bundle A - Additive Submethod Family + Refined Lee"
+  readiness: strong_now
+dataset:
+  name: ssdd
+  split: train
+  sample_limit: 8
+processing:
+  additive:
+    family: bundle_a_submethods
+    submethod: auto
+    fallback_submethod: A2
+    domain: intensity
+    require_metadata: false
+    artifact_auto_threshold: 0.10
+    image_floor:
+      floor_quantile: 0.02
+      quiet_upper_quantile: 0.25
+    structured_artifact:
+      domain: intensity
+      orientation: columns
+      background_sigma: 9.0
+      profile_sigma: 3.0
+      correction_strength: 1.0
+  multiplicative:
+    method: refined_lee
+    domain: intensity
+    window_size: 7
+    strength: 1.0
+metrics:
+  proxy_enl:
+    patch_size: 32
+  edge_sharpness:
+    top_quantile: 0.9
+  detection_proxy:
+    threshold_quantile: 0.98
+statistics:
+  enabled: true
+  dilation_radius: 4
+  background_lower_quantile: 0.05
+  background_upper_quantile: 0.5
+  max_points_per_sample: 15000
+downstream:
+  primary_task: ship_detection_proxy
+  detector_status: proxy_only
+  recommended_datasets:
+    - ssdd
+    - hrsid
+    - sentinel1
+outputs:
+  root: results/bundle_a
+  max_visual_samples: 6
+  save_intermediate_arrays: false

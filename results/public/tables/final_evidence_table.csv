@@ -1,0 +1,16 @@
+track,dataset,variant,label,sample_count,mean_psnr,mean_ssim,mean_mse,mean_nrmse,mean_edge_preservation_index,train_count,val_count,test_count,map,map50,map75,precision,recall,f1
+paired_denoising,Mendeley SAR despeckling val,raw,Raw,100,18.0782,0.5261,0.0165,0.3256,0.5583,,,,,,,,,
+paired_denoising,Mendeley SAR despeckling val,bundle_a,Bundle A,100,19.4577,0.5651,0.012262,0.2751,0.539,,,,,,,,,
+paired_denoising,Mendeley SAR despeckling val,bundle_a_conservative,A conservative,100,18.861,0.5544,0.013822,0.2971,0.5647,,,,,,,,,
+paired_denoising,Mendeley SAR despeckling val,bundle_b,Bundle B,100,20.3082,0.5974,0.009829,0.2513,0.588,,,,,,,,,
+paired_denoising,Mendeley SAR despeckling val,bundle_d,Bundle D,100,19.4313,0.5825,0.012149,0.2794,0.5871,,,,,,,,,
+detector_compatibility,HRSID,raw,Raw,,,,,,,256,256,256,0.6486,0.933,0.7805,0.9628,0.8695,0.9138
+detector_compatibility,HRSID,bundle_a,Bundle A,,,,,,,256,256,256,0.5277,0.8931,0.5625,0.9555,0.8072,0.8751
+detector_compatibility,HRSID,bundle_a_conservative,A conservative,,,,,,,256,256,256,0.5229,0.8872,0.5521,0.9415,0.7992,0.8645
+detector_compatibility,HRSID,bundle_b,Bundle B,,,,,,,256,256,256,0.4742,0.8694,0.4571,0.9273,0.7791,0.8468
+detector_compatibility,HRSID,bundle_d,Bundle D,,,,,,,256,256,256,0.5325,0.8993,0.5811,0.9582,0.8293,0.8891
+detector_compatibility,SSDD,raw,Raw,,,,,,,256,186,232,0.4894,0.7889,0.557,0.797,0.7051,0.7482
+detector_compatibility,SSDD,bundle_a,Bundle A,,,,,,,256,186,232,0.3426,0.7018,0.286,0.8228,0.6117,0.7017
+detector_compatibility,SSDD,bundle_a_conservative,A conservative,,,,,,,256,186,232,0.3766,0.7397,0.3295,0.7907,0.6643,0.722
+detector_compatibility,SSDD,bundle_b,Bundle B,,,,,,,256,186,232,0.3661,0.715,0.3285,0.7916,0.6337,0.7039
+detector_compatibility,SSDD,bundle_d,Bundle D,,,,,,,256,186,232,0.4033,0.7357,0.4123,0.8399,0.6342,0.7227

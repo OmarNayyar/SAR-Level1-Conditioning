@@ -1,0 +1,37 @@
+bundle:
+  name: bundle_a
+  title: "Bundle A Aggressive - Stress Cleanup"
+  readiness: stress_test_only
+profile:
+  name: aggressive
+  purpose: "Stress-test cleanup when speckle/artifacts are visually strong; validate against raw before use."
+dataset:
+  name: ssdd
+  split: train
+  sample_limit: 16
+processing:
+  additive:
+    family: bundle_a_submethods
+    submethod: auto
+    fallback_submethod: A2
+    domain: intensity
+    require_metadata: false
+    artifact_auto_threshold: 0.06
+    image_floor:
+      floor_quantile: 0.04
+      quiet_upper_quantile: 0.30
+    structured_artifact:
+      domain: intensity
+      orientation: columns
+      background_sigma: 7.0
+      profile_sigma: 2.0
+      correction_strength: 1.25
+  multiplicative:
+    method: refined_lee
+    domain: intensity
+    window_size: 7
+    strength: 1.0
+outputs:
+  root: outputs/profiles/bundle_a_aggressive
+  max_visual_samples: 6
+  save_intermediate_arrays: false

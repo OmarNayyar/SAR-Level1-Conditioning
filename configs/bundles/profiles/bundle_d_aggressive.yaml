@@ -1,0 +1,31 @@
+bundle:
+  name: bundle_d
+  title: "Bundle D Aggressive - Inverse Cleanup Stress Test"
+  readiness: stress_test_only
+profile:
+  name: aggressive
+  purpose: "Stress-test denoising strength; likely risky for detector texture."
+dataset:
+  name: hrsid
+  split: train
+  sample_limit: 16
+processing:
+  additive:
+    method: pnp_admm_additive
+    domain: log_intensity
+    iterations: 10
+    rho: 1.25
+    denoiser_backend: wavelet
+    strength: 1.0
+  multiplicative:
+    method: speckle2void_wrapper
+    domain: intensity
+    fallback_sigma: 1.4
+    strength: 1.0
+    external:
+      command: []
+      cwd: ""
+outputs:
+  root: outputs/profiles/bundle_d_aggressive
+  max_visual_samples: 6
+  save_intermediate_arrays: false

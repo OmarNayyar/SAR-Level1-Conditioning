@@ -1,0 +1,6 @@
+bundle,profile,config,purpose,main_knobs
+A,conservative,configs/bundles/profiles/bundle_a_conservative.yaml,preserve detector texture and edges while testing mild additive/speckle cleanup,"Lee strength, image-floor quantile, artifact threshold/correction strength"
+A,balanced,configs/bundles/profiles/bundle_a_balanced.yaml,current proxy-screening default,"A2 floor quantile, A3 threshold, Refined Lee strength"
+A,aggressive,configs/bundles/profiles/bundle_a_aggressive.yaml,stress-test cleanup when speckle/artifacts are visibly strong,higher floor/correction strength and full Refined Lee
+B,conservative/balanced/aggressive,configs/bundles/profiles/bundle_b_*.yaml,test structured artifact cleanup strength without hand-editing code,"destripe correction strength, profile/background sigma, MuLoG blend strength"
+D,conservative/balanced/aggressive,configs/bundles/profiles/bundle_d_*.yaml,test inverse/self-supervised cleanup strength against detector edge retention,"PnP iterations/rho/strength, Speckle2Void fallback sigma/blend strength"

@@ -1,0 +1,25 @@
+dataset:
+  name: ssdd
+  # Use `none` for full dataset mode. 256 per split is the default validation
+  # scale for local Windows/CPU runs: meaningful enough to move beyond toy
+  # smoke tests, but still controllable on a laptop.
+  limit_per_split: 256
+  val_fraction: 0.2
+variants:
+  - raw
+  - bundle_a
+  - bundle_b
+  - bundle_d
+  - bundle_a_conservative
+detector:
+  backend: ultralytics
+  model: yolov8n.pt
+  epochs: 12
+  imgsz: 640
+  batch: 4
+  # Keep this at 0 on Windows unless multiprocessing is known to work locally.
+  workers: 0
+  eval_split: test
+  device: ""
+outputs:
+  root: outputs/downstream_detection_baseline

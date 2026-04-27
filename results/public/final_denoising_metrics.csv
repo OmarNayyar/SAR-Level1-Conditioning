@@ -1,0 +1,6 @@
+track,dataset,variant,label,sample_count,mean_psnr,mean_ssim,mean_mse,mean_nrmse,mean_edge_preservation_index
+paired_denoising,Mendeley SAR despeckling val,raw,Raw,100,18.0782,0.5261,0.0165,0.3256,0.5583
+paired_denoising,Mendeley SAR despeckling val,bundle_a,Bundle A,100,19.4577,0.5651,0.012262,0.2751,0.539
+paired_denoising,Mendeley SAR despeckling val,bundle_a_conservative,A conservative,100,18.861,0.5544,0.013822,0.2971,0.5647
+paired_denoising,Mendeley SAR despeckling val,bundle_b,Bundle B,100,20.3082,0.5974,0.009829,0.2513,0.588
+paired_denoising,Mendeley SAR despeckling val,bundle_d,Bundle D,100,19.4313,0.5825,0.012149,0.2794,0.5871

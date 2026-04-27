@@ -1,0 +1,10 @@
+query:
+  product_type: GRD
+  mode: IW
+  start: "2024-01-01"
+  end: "2024-01-07"
+  bbox: [-5.5, 48.2, -3.0, 49.6]
+  max_results: 3
+  metadata_only: true
+  order_desc: true
+  include_auxiliary: false

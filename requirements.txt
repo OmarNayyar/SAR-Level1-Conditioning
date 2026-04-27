@@ -1,0 +1,16 @@
+# Core runtime
+numpy>=1.26,<3
+scipy>=1.11,<2
+matplotlib>=3.8,<4
+scikit-image>=0.22,<0.26
+imagecodecs>=2024.1.1,<2027
+pandas>=2.2,<3
+PyYAML>=6.0,<7
+requests>=2.31,<3
+Pillow>=10,<12
+
+# Local app / optional workflows used in this repo
+streamlit>=1.40,<2
+ultralytics>=8.3,<9
+jupyter>=1.1,<2
+pytest>=8.2,<9

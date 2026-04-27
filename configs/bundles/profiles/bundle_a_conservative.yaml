@@ -1,0 +1,37 @@
+bundle:
+  name: bundle_a
+  title: "Bundle A Conservative - Detector Texture Preservation"
+  readiness: detector_tuning_candidate
+profile:
+  name: conservative
+  purpose: "Reduce damage to target edges/texture while keeping a mild Stage-1 cleanup path."
+dataset:
+  name: ssdd
+  split: train
+  sample_limit: 16
+processing:
+  additive:
+    family: bundle_a_submethods
+    submethod: auto
+    fallback_submethod: A2
+    domain: intensity
+    require_metadata: false
+    artifact_auto_threshold: 0.18
+    image_floor:
+      floor_quantile: 0.005
+      quiet_upper_quantile: 0.20
+    structured_artifact:
+      domain: intensity
+      orientation: columns
+      background_sigma: 11.0
+      profile_sigma: 4.0
+      correction_strength: 0.35
+  multiplicative:
+    method: refined_lee
+    domain: intensity
+    window_size: 7
+    strength: 0.35
+outputs:
+  root: outputs/profiles/bundle_a_conservative
+  max_visual_samples: 6
+  save_intermediate_arrays: false

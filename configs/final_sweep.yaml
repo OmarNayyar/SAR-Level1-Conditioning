@@ -1,0 +1,38 @@
+detection:
+  config: configs/downstream/yolo_medium.yaml
+  mode: all
+  output_root: outputs/final_sweep/downstream_detection
+  datasets:
+    - ssdd
+    - hrsid
+  variants:
+    - raw
+    - bundle_a
+    - bundle_a_conservative
+    - bundle_b
+    - bundle_d
+  bundle_a_config: configs/bundle_a.yaml
+  bundle_a_conservative_config: configs/bundle_a_conservative.yaml
+  bundle_b_config: configs/bundles/profiles/bundle_b_balanced.yaml
+  bundle_d_config: configs/bundles/profiles/bundle_d_conservative.yaml
+
+reports:
+  generate_surface_packs: true
+  surface: all
+  generate_demo_index: true
+  demo_index_max_examples: 8
+  summary_output: outputs/final_sweep/final_sweep_summary.json
+
+freeze:
+  selected_datasets:
+    - ssdd
+    - hrsid
+  selected_variants:
+    - raw
+    - bundle_a
+    - bundle_a_conservative
+    - bundle_b
+    - bundle_d
+  notes:
+    - Raw remains the operational detector baseline unless a conditioned variant clearly beats it.
+    - Public/private text and app surfaces should be finalized before the intentional heavy run.

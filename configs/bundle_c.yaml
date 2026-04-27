@@ -1,0 +1,35 @@
+bundle:
+  name: bundle_c
+  title: "Bundle C - Starlet Complex + MERLIN Wrapper"
+  readiness: feasibility_demo
+  allow_detected_fallback: true
+dataset:
+  name: ssdd
+  split: train
+  sample_limit: 4
+processing:
+  additive:
+    method: starlet_complex_denoise
+    domain: complex_slc
+    levels: 4
+    threshold_scale: 3.0
+  multiplicative:
+    method: merlin_wrapper
+    domain: complex_slc
+    fallback_levels: 3
+    fallback_threshold_scale: 2.5
+    external:
+      command: []
+      cwd: ""
+metrics:
+  proxy_enl:
+    patch_size: 32
+  edge_sharpness:
+    top_quantile: 0.9
+  detection_proxy:
+    threshold_quantile: 0.98
+downstream:
+  primary_task: proxy_only
+  detector_status: not_wired
+outputs:
+  root: results/bundle_c

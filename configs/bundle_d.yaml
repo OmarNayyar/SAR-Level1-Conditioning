@@ -1,0 +1,40 @@
+bundle:
+  name: bundle_d
+  title: "Bundle D - PnP-ADMM + Speckle2Void Wrapper"
+  readiness: serious_second_path
+dataset:
+  name: hrsid
+  split: train
+  sample_limit: 8
+processing:
+  additive:
+    method: pnp_admm_additive
+    domain: log_intensity
+    iterations: 6
+    rho: 1.0
+    denoiser_backend: wavelet
+  multiplicative:
+    method: speckle2void_wrapper
+    domain: intensity
+    fallback_sigma: 1.0
+    external:
+      command: []
+      cwd: ""
+metrics:
+  proxy_enl:
+    patch_size: 32
+  edge_sharpness:
+    top_quantile: 0.9
+  detection_proxy:
+    threshold_quantile: 0.98
+statistics:
+  enabled: true
+  dilation_radius: 4
+  background_lower_quantile: 0.05
+  background_upper_quantile: 0.5
+  max_points_per_sample: 15000
+downstream:
+  primary_task: ship_detection_proxy
+  detector_status: proxy_only
+outputs:
+  root: results/bundle_d

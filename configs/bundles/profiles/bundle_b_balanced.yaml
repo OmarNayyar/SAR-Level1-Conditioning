@@ -1,0 +1,28 @@
+bundle:
+  name: bundle_b
+  title: "Bundle B Balanced - Destriping + MuLoG"
+  readiness: secondary_candidate
+profile:
+  name: balanced
+  purpose: "Structured artifact candidate with normal destriping and log-domain denoising strength."
+dataset:
+  name: hrsid
+  split: train
+  sample_limit: 16
+processing:
+  additive:
+    method: destripe_lowrank_sparse
+    domain: log_intensity
+    orientation: columns
+    background_sigma: 9.0
+    profile_sigma: 3.0
+    correction_strength: 0.8
+  multiplicative:
+    method: mulog_bm3d
+    domain: log_intensity
+    backend_preference: bm3d
+    strength: 0.8
+outputs:
+  root: outputs/profiles/bundle_b_balanced
+  max_visual_samples: 6
+  save_intermediate_arrays: false
