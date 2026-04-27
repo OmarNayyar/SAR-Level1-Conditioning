@@ -1,33 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
   <title id="title">Bundle A B C D method matrix</title>
   <desc id="desc">Four Stage-1 conditioning bundles combine additive cleanup and speckle-aware methods across intensity, GRD, and future SLC routes.</desc>
-  <rect width="1200" height="680" rx="28" fill="#0b1120"/>
-  <text x="60" y="72" fill="#f8fafc" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="800">Four candidate Stage-1 conditioning bundles</text>
-  <text x="60" y="108" fill="#cbd5e1" font-family="Segoe UI, Arial, sans-serif" font-size="18">Each bundle is a route to test, not a universal claim that conditioning always helps.</text>
+  <rect width="1200" height="700" rx="30" fill="#0b1120"/>
+  <text x="70" y="74" fill="#f8fafc" font-family="Segoe UI, Arial, sans-serif" font-size="32" font-weight="800">Four candidate Stage-1 conditioning bundles</text>
+  <text x="70" y="111" fill="#cbd5e1" font-family="Segoe UI, Arial, sans-serif" font-size="17">Each bundle is a route to test, not a universal claim that conditioning always helps.</text>
+
   <g font-family="Segoe UI, Arial, sans-serif">
-    <rect x="70" y="160" width="500" height="185" rx="24" fill="#082f49" stroke="#38bdf8" stroke-width="2"/>
-    <text x="105" y="208" fill="#e0f2fe" font-size="30" font-weight="800">Bundle A</text>
-    <text x="105" y="245" fill="#bae6fd" font-size="18">metadata/noise-vector correction</text>
-    <path d="M118 275 L522 275" stroke="#38bdf8" stroke-width="2" opacity="0.6"/>
-    <text x="105" y="311" fill="#e0f2fe" font-size="18">then Lee / refined Lee</text>
-    <text x="105" y="333" fill="#93c5fd" font-size="14">interpretable screening baseline, not best detector baseline</text>
-    <rect x="630" y="160" width="500" height="185" rx="24" fill="#14532d" stroke="#4ade80" stroke-width="2"/>
-    <text x="665" y="208" fill="#dcfce7" font-size="30" font-weight="800">Bundle B</text>
-    <text x="665" y="245" fill="#bbf7d0" font-size="18">destriping / artifact correction</text>
-    <path d="M678 275 L1082 275" stroke="#4ade80" stroke-width="2" opacity="0.6"/>
-    <text x="665" y="311" fill="#dcfce7" font-size="18">then MuLoG / BM3D-style despeckling</text>
-    <text x="665" y="333" fill="#86efac" font-size="14">strongest paired denoising result in current public validation</text>
-    <rect x="70" y="395" width="500" height="185" rx="24" fill="#3b0764" stroke="#c084fc" stroke-width="2"/>
-    <text x="105" y="443" fill="#faf5ff" font-size="30" font-weight="800">Bundle C</text>
-    <text x="105" y="480" fill="#e9d5ff" font-size="18">starlet complex-domain denoising</text>
-    <path d="M118 510 L522 510" stroke="#c084fc" stroke-width="2" opacity="0.6"/>
-    <text x="105" y="546" fill="#faf5ff" font-size="18">then MERLIN-style SLC self-supervision</text>
-    <text x="105" y="568" fill="#d8b4fe" font-size="14">future SLC-first path pending SLC validation</text>
-    <rect x="630" y="395" width="500" height="185" rx="24" fill="#7c2d12" stroke="#fb923c" stroke-width="2"/>
-    <text x="665" y="443" fill="#fff7ed" font-size="30" font-weight="800">Bundle D</text>
-    <text x="665" y="480" fill="#fed7aa" font-size="18">PnP / ADMM additive cleanup</text>
-    <path d="M678 510 L1082 510" stroke="#fb923c" stroke-width="2" opacity="0.6"/>
-    <text x="665" y="546" fill="#fff7ed" font-size="18">then Speckle2Void-style blind-spot filtering</text>
-    <text x="665" y="568" fill="#fdba74" font-size="14">structure-preserving candidate for intensity-only settings</text>
+    <rect x="70" y="165" width="510" height="190" rx="24" fill="#082f49" stroke="#38bdf8" stroke-width="2"/>
+    <text x="105" y="215" fill="#e0f2fe" font-size="29" font-weight="800">Bundle A</text>
+    <text x="105" y="253" fill="#bae6fd" font-size="17">metadata / noise-vector correction</text>
+    <path d="M105 285 L545 285" stroke="#38bdf8" stroke-width="2" opacity="0.6"/>
+    <text x="105" y="325" fill="#e0f2fe" font-size="17">Lee / refined Lee speckle filtering</text>
+    <text x="105" y="348" fill="#93c5fd" font-size="13">interpretable screening baseline; not the detector winner</text>
+
+    <rect x="620" y="165" width="510" height="190" rx="24" fill="#14532d" stroke="#4ade80" stroke-width="2"/>
+    <text x="655" y="215" fill="#dcfce7" font-size="29" font-weight="800">Bundle B</text>
+    <text x="655" y="253" fill="#bbf7d0" font-size="17">destriping / artifact correction</text>
+    <path d="M655 285 L1095 285" stroke="#4ade80" stroke-width="2" opacity="0.6"/>
+    <text x="655" y="325" fill="#dcfce7" font-size="17">MuLoG / BM3D-style despeckling</text>
+    <text x="655" y="348" fill="#86efac" font-size="13">strongest paired denoising result in public validation</text>
+
+    <rect x="70" y="405" width="510" height="190" rx="24" fill="#3b0764" stroke="#c084fc" stroke-width="2"/>
+    <text x="105" y="455" fill="#faf5ff" font-size="29" font-weight="800">Bundle C</text>
+    <text x="105" y="493" fill="#e9d5ff" font-size="17">starlet complex-domain denoising</text>
+    <path d="M105 525 L545 525" stroke="#c084fc" stroke-width="2" opacity="0.6"/>
+    <text x="105" y="565" fill="#faf5ff" font-size="17">MERLIN-style SLC self-supervision</text>
+    <text x="105" y="588" fill="#d8b4fe" font-size="13">future SLC-first path pending SLC validation</text>
+
+    <rect x="620" y="405" width="510" height="190" rx="24" fill="#7c2d12" stroke="#fb923c" stroke-width="2"/>
+    <text x="655" y="455" fill="#fff7ed" font-size="29" font-weight="800">Bundle D</text>
+    <text x="655" y="493" fill="#fed7aa" font-size="17">PnP / ADMM additive cleanup</text>
+    <path d="M655 525 L1095 525" stroke="#fb923c" stroke-width="2" opacity="0.6"/>
+    <text x="655" y="565" fill="#fff7ed" font-size="17">Speckle2Void-style blind-spot filtering</text>
+    <text x="655" y="588" fill="#fdba74" font-size="13">structure-preserving candidate for intensity-only settings</text>
   </g>
 </svg>

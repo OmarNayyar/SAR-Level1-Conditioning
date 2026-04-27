@@ -1,38 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
   <title id="title">SAR additive and multiplicative noise model</title>
   <desc id="desc">SAR observations combine useful signal, additive thermal noise or noise floor effects, multiplicative speckle, and sometimes both together.</desc>
-  <rect width="1200" height="520" rx="28" fill="#f8fafc"/>
-  <text x="60" y="70" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="800">SAR observation = signal + additive noise + multiplicative speckle</text>
-  <text x="60" y="106" fill="#475569" font-family="Segoe UI, Arial, sans-serif" font-size="18">Stage-1 conditioning separates failure modes instead of treating all noise as one generic blur problem.</text>
+  <rect width="1200" height="560" rx="30" fill="#f8fafc"/>
+  <text x="60" y="66" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="32" font-weight="800">SAR observation = signal + additive noise + multiplicative speckle</text>
+  <text x="60" y="102" fill="#475569" font-family="Segoe UI, Arial, sans-serif" font-size="17">Stage-1 conditioning separates failure modes instead of treating all noise as one generic blur problem.</text>
+
   <g font-family="Segoe UI, Arial, sans-serif">
-    <rect x="70" y="160" width="250" height="245" rx="24" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
-    <text x="195" y="205" text-anchor="middle" fill="#0c4a6e" font-size="24" font-weight="800">Signal</text>
-    <path d="M105 320 C140 240, 170 360, 205 280 S270 305, 290 245" fill="none" stroke="#0369a1" stroke-width="6"/>
-    <text x="195" y="370" text-anchor="middle" fill="#075985" font-size="16">ships, wake texture, coastlines,</text>
-    <text x="195" y="395" text-anchor="middle" fill="#075985" font-size="16">ocean backscatter</text>
-    <text x="350" y="292" fill="#334155" font-size="54" font-weight="700">+</text>
-    <rect x="420" y="160" width="250" height="245" rx="24" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
-    <text x="545" y="205" text-anchor="middle" fill="#7f1d1d" font-size="24" font-weight="800">Additive</text>
-    <text x="545" y="232" text-anchor="middle" fill="#991b1b" font-size="17">thermal / noise floor</text>
+    <rect x="70" y="155" width="270" height="270" rx="24" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+    <text x="205" y="205" text-anchor="middle" fill="#0c4a6e" font-size="24" font-weight="800">Signal</text>
+    <path d="M115 320 C150 240, 184 360, 220 280 S286 305, 310 245" fill="none" stroke="#0369a1" stroke-width="6"/>
+    <text x="205" y="372" text-anchor="middle" fill="#075985" font-size="15">ships, wakes, coastline</text>
+    <text x="205" y="397" text-anchor="middle" fill="#075985" font-size="15">and ocean backscatter</text>
+
+    <text x="390" y="310" text-anchor="middle" fill="#334155" font-size="52" font-weight="700">+</text>
+
+    <rect x="450" y="155" width="270" height="270" rx="24" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+    <text x="585" y="205" text-anchor="middle" fill="#7f1d1d" font-size="24" font-weight="800">Additive</text>
+    <text x="585" y="232" text-anchor="middle" fill="#991b1b" font-size="16">thermal / noise floor</text>
     <g fill="#ef4444" opacity="0.85">
-      <rect x="465" y="278" width="160" height="12" rx="6"/>
-      <rect x="475" y="314" width="145" height="10" rx="5"/>
-      <circle cx="490" cy="250" r="6"/><circle cx="590" cy="255" r="5"/><circle cx="540" cy="350" r="5"/>
+      <rect x="505" y="278" width="160" height="12" rx="6"/>
+      <rect x="515" y="314" width="145" height="10" rx="5"/>
+      <circle cx="525" cy="250" r="6"/><circle cx="625" cy="255" r="5"/><circle cx="585" cy="350" r="5"/>
     </g>
-    <text x="545" y="370" text-anchor="middle" fill="#7f1d1d" font-size="16">dark ocean lift, seams,</text>
-    <text x="545" y="395" text-anchor="middle" fill="#7f1d1d" font-size="16">banding, NESZ/noise-floor bias</text>
-    <text x="700" y="292" fill="#334155" font-size="54" font-weight="700">x</text>
-    <rect x="770" y="160" width="250" height="245" rx="24" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
-    <text x="895" y="205" text-anchor="middle" fill="#78350f" font-size="24" font-weight="800">Speckle</text>
-    <text x="895" y="232" text-anchor="middle" fill="#92400e" font-size="17">multiplicative texture</text>
+    <text x="585" y="372" text-anchor="middle" fill="#7f1d1d" font-size="15">dark-ocean floor lift</text>
+    <text x="585" y="397" text-anchor="middle" fill="#7f1d1d" font-size="15">seams, banding, NESZ bias</text>
+
+    <text x="770" y="310" text-anchor="middle" fill="#334155" font-size="52" font-weight="700">x</text>
+
+    <rect x="830" y="155" width="270" height="270" rx="24" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+    <text x="965" y="205" text-anchor="middle" fill="#78350f" font-size="24" font-weight="800">Speckle</text>
+    <text x="965" y="232" text-anchor="middle" fill="#92400e" font-size="16">multiplicative texture</text>
     <g fill="#f59e0b">
-      <circle cx="825" cy="268" r="7"/><circle cx="875" cy="250" r="4"/><circle cx="925" cy="288" r="8"/>
-      <circle cx="965" cy="248" r="5"/><circle cx="840" cy="330" r="5"/><circle cx="900" cy="342" r="9"/>
-      <circle cx="965" cy="330" r="6"/><circle cx="870" cy="300" r="3"/><circle cx="940" cy="360" r="4"/>
+      <circle cx="895" cy="268" r="7"/><circle cx="945" cy="250" r="4"/><circle cx="995" cy="288" r="8"/>
+      <circle cx="1035" cy="248" r="5"/><circle cx="910" cy="330" r="5"/><circle cx="970" cy="342" r="9"/>
+      <circle cx="1035" cy="330" r="6"/><circle cx="940" cy="300" r="3"/><circle cx="1010" cy="360" r="4"/>
     </g>
-    <text x="895" y="370" text-anchor="middle" fill="#78350f" font-size="16">grainy coherent interference,</text>
-    <text x="895" y="395" text-anchor="middle" fill="#78350f" font-size="16">especially in low-look maritime SAR</text>
+    <text x="965" y="372" text-anchor="middle" fill="#78350f" font-size="15">grainy coherent variation</text>
+    <text x="965" y="397" text-anchor="middle" fill="#78350f" font-size="15">common in low-look SAR</text>
   </g>
-  <rect x="160" y="445" width="880" height="42" rx="21" fill="#0f172a"/>
-  <text x="600" y="472" text-anchor="middle" fill="#e2e8f0" font-family="Segoe UI, Arial, sans-serif" font-size="17">Combined noise is common: the right bundle depends on product domain, metadata, and the downstream task.</text>
+
+  <rect x="130" y="470" width="940" height="46" rx="23" fill="#0f172a"/>
+  <text x="600" y="499" text-anchor="middle" fill="#e2e8f0" font-family="Segoe UI, Arial, sans-serif" font-size="16">Combined noise is common. Choose bundles by product domain, metadata, and downstream task.</text>
 </svg>

@@ -1,41 +1,53 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
   <title id="title">Bundle routing decision tree</title>
   <desc id="desc">Decision tree for choosing Bundle A B C or D based on product domain, metadata, and artifact regime.</desc>
-  <rect width="1200" height="620" rx="28" fill="#ffffff"/>
-  <text x="60" y="70" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="800">Which bundle should I try first?</text>
-  <text x="60" y="106" fill="#475569" font-family="Segoe UI, Arial, sans-serif" font-size="18">Use this as a routing guide, then validate with metrics for the actual task.</text>
+  <rect width="1200" height="700" rx="30" fill="#ffffff"/>
+  <text x="60" y="70" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="32" font-weight="800">Which bundle should I try first?</text>
+  <text x="60" y="106" fill="#475569" font-family="Segoe UI, Arial, sans-serif" font-size="17">Use this as a routing guide, then validate with metrics for the actual task.</text>
+
   <g font-family="Segoe UI, Arial, sans-serif" stroke-width="2">
-    <rect x="450" y="150" width="300" height="70" rx="18" fill="#0f172a"/>
-    <text x="600" y="194" text-anchor="middle" fill="#f8fafc" font-size="21" font-weight="800">What product domain?</text>
-    <path d="M600 220 L270 285" stroke="#64748b"/>
-    <path d="M600 220 L600 285" stroke="#64748b"/>
-    <path d="M600 220 L930 285" stroke="#64748b"/>
-    <rect x="110" y="285" width="320" height="75" rx="18" fill="#f3e8ff" stroke="#a855f7"/>
-    <text x="270" y="316" text-anchor="middle" fill="#581c87" font-size="19" font-weight="800">Complex SLC available?</text>
-    <text x="270" y="342" text-anchor="middle" fill="#6b21a8" font-size="15">Preserve phase / Re-Im structure</text>
-    <rect x="445" y="285" width="310" height="75" rx="18" fill="#e0f2fe" stroke="#0284c7"/>
-    <text x="600" y="316" text-anchor="middle" fill="#0c4a6e" font-size="19" font-weight="800">Intensity/GRD + metadata?</text>
-    <text x="600" y="342" text-anchor="middle" fill="#075985" font-size="15">Noise vectors, NESZ, mode/pol known</text>
-    <rect x="780" y="285" width="310" height="75" rx="18" fill="#ffedd5" stroke="#f97316"/>
-    <text x="935" y="316" text-anchor="middle" fill="#7c2d12" font-size="19" font-weight="800">Unknown or mixed metadata?</text>
-    <text x="935" y="342" text-anchor="middle" fill="#9a3412" font-size="15">Need intensity-only fallback</text>
-    <path d="M270 360 L270 420" stroke="#64748b"/>
-    <path d="M600 360 L500 420" stroke="#64748b"/>
-    <path d="M600 360 L700 420" stroke="#64748b"/>
-    <path d="M935 360 L935 420" stroke="#64748b"/>
-    <rect x="105" y="420" width="330" height="105" rx="22" fill="#3b0764"/>
-    <text x="270" y="462" text-anchor="middle" fill="#faf5ff" font-size="24" font-weight="800">Bundle C</text>
-    <text x="270" y="492" text-anchor="middle" fill="#e9d5ff" font-size="16">starlet + MERLIN-style SLC path</text>
-    <text x="270" y="516" text-anchor="middle" fill="#d8b4fe" font-size="14">future validation route</text>
-    <rect x="465" y="420" width="250" height="105" rx="22" fill="#082f49"/>
-    <text x="590" y="462" text-anchor="middle" fill="#e0f2fe" font-size="24" font-weight="800">Bundle A</text>
-    <text x="590" y="492" text-anchor="middle" fill="#bae6fd" font-size="16">metadata-first baseline</text>
-    <text x="590" y="516" text-anchor="middle" fill="#93c5fd" font-size="14">best first screen</text>
-    <rect x="745" y="420" width="250" height="105" rx="22" fill="#14532d"/>
-    <text x="870" y="462" text-anchor="middle" fill="#dcfce7" font-size="24" font-weight="800">Bundle B</text>
-    <text x="870" y="492" text-anchor="middle" fill="#bbf7d0" font-size="16">structured artifacts + speckle</text>
-    <text x="870" y="516" text-anchor="middle" fill="#86efac" font-size="14">current denoising leader</text>
-    <rect x="865" y="545" width="250" height="52" rx="18" fill="#7c2d12"/>
-    <text x="990" y="578" text-anchor="middle" fill="#fff7ed" font-size="18" font-weight="800">Bundle D fallback: intensity-only / mixed regimes</text>
+    <rect x="430" y="150" width="340" height="74" rx="18" fill="#0f172a"/>
+    <text x="600" y="196" text-anchor="middle" fill="#f8fafc" font-size="20" font-weight="800">What product domain?</text>
+
+    <path d="M600 224 L255 300" stroke="#64748b"/>
+    <path d="M600 224 L600 300" stroke="#64748b"/>
+    <path d="M600 224 L945 300" stroke="#64748b"/>
+
+    <rect x="95" y="300" width="320" height="78" rx="18" fill="#f3e8ff" stroke="#a855f7"/>
+    <text x="255" y="330" text-anchor="middle" fill="#581c87" font-size="18" font-weight="800">Complex SLC available?</text>
+    <text x="255" y="357" text-anchor="middle" fill="#6b21a8" font-size="14">Preserve phase / Re-Im structure</text>
+
+    <rect x="440" y="300" width="320" height="78" rx="18" fill="#e0f2fe" stroke="#0284c7"/>
+    <text x="600" y="330" text-anchor="middle" fill="#0c4a6e" font-size="18" font-weight="800">Intensity / GRD + metadata?</text>
+    <text x="600" y="357" text-anchor="middle" fill="#075985" font-size="14">Noise vectors, NESZ, mode/pol known</text>
+
+    <rect x="785" y="300" width="320" height="78" rx="18" fill="#ffedd5" stroke="#f97316"/>
+    <text x="945" y="330" text-anchor="middle" fill="#7c2d12" font-size="18" font-weight="800">Unknown or mixed metadata?</text>
+    <text x="945" y="357" text-anchor="middle" fill="#9a3412" font-size="14">Need intensity-only fallback</text>
+
+    <path d="M255 378 L255 438" stroke="#64748b"/>
+    <path d="M600 378 L500 438" stroke="#64748b"/>
+    <path d="M600 378 L700 438" stroke="#64748b"/>
+    <path d="M945 378 L945 438" stroke="#64748b"/>
+
+    <rect x="95" y="438" width="320" height="110" rx="22" fill="#3b0764"/>
+    <text x="255" y="480" text-anchor="middle" fill="#faf5ff" font-size="24" font-weight="800">Bundle C</text>
+    <text x="255" y="510" text-anchor="middle" fill="#e9d5ff" font-size="15">starlet + MERLIN-style SLC path</text>
+    <text x="255" y="535" text-anchor="middle" fill="#d8b4fe" font-size="14">future validation route</text>
+
+    <rect x="440" y="438" width="250" height="110" rx="22" fill="#082f49"/>
+    <text x="565" y="480" text-anchor="middle" fill="#e0f2fe" font-size="24" font-weight="800">Bundle A</text>
+    <text x="565" y="510" text-anchor="middle" fill="#bae6fd" font-size="15">metadata-first baseline</text>
+    <text x="565" y="535" text-anchor="middle" fill="#93c5fd" font-size="14">best first screen</text>
+
+    <rect x="720" y="438" width="250" height="110" rx="22" fill="#14532d"/>
+    <text x="845" y="480" text-anchor="middle" fill="#dcfce7" font-size="24" font-weight="800">Bundle B</text>
+    <text x="845" y="510" text-anchor="middle" fill="#bbf7d0" font-size="15">structured artifacts + speckle</text>
+    <text x="845" y="535" text-anchor="middle" fill="#86efac" font-size="14">current denoising leader</text>
+
+    <path d="M945 548 L945 582" stroke="#64748b"/>
+    <rect x="720" y="582" width="430" height="72" rx="20" fill="#7c2d12"/>
+    <text x="935" y="613" text-anchor="middle" fill="#fff7ed" font-size="22" font-weight="800">Bundle D</text>
+    <text x="935" y="639" text-anchor="middle" fill="#fed7aa" font-size="15">fallback for intensity-only / mixed metadata regimes</text>
   </g>
 </svg>
